@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(keybindings-help)",
+      "PowerShell(git config *)",
+      "PowerShell(if \\(Test-Path \"$env:USERPROFILE\\\\.ssh\\\\id_ed25519.pub\"\\) { Write-Host \"ED25519 SSH key exists\" } elseif \\(Test-Path \"$env:USERPROFILE\\\\.ssh\\\\id_rsa.pub\"\\) { Write-Host \"RSA SSH key exists\" } else { Write-Host \"No SSH key found\" })",
+      "PowerShell(ssh-keygen *)",
+      "PowerShell(New-Item *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(ssh -T -o StrictHostKeyChecking=accept-new git@github.com 2>&1)",
+      "PowerShell(\\(Get-Command git\\).Source)",
+      "PowerShell(\\(Get-Command claude\\).Source)",
+      "PowerShell(python -c \"import py_compile; files=['config.py','serial_ctrl.py','intent.py','feishu_bot.py','main.py']; [py_compile.compile\\(f, doraise=True\\) or print\\(f'✅ {f}'\\) for f in files]\")",
+      "PowerShell(python -m py_compile config.py; python -m py_compile serial_ctrl.py; python -m py_compile intent.py; python -m py_compile feishu_bot.py; python -m py_compile main.py; Write-Output \"All files OK\")",
+      "PowerShell(python -c \"import flask; import serial; import requests; import dotenv; import openai; print\\('✅ 所有依赖已安装'\\)\")",
+      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" init)",
+      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" config user.name \"gagasgew\"; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" config user.email \"lisida995@gmail.com\")",
+      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" add .; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" commit -m \"初始提交：飞书聊天控制 STM32 LED 项目\")"
+    ]
+  }
+}
