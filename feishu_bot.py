@@ -107,6 +107,7 @@ def parse_message(body: dict) -> dict | None:
             return None
 
         # 去除群聊中的 @机器人 前缀（如 "@_user_1 开灯" → "开灯"）
+        # 私聊消息没有 @前缀，此正则无匹配，文本原样保留
         import re
         text = re.sub(r'@\S+\s*', '', text).strip()
 
@@ -125,10 +126,10 @@ def parse_message(body: dict) -> dict | None:
 
 def send_message(chat_id: str, text: str):
     """
-    通过飞书 API 回复群消息
+    通过飞书 API 回复消息（支持群聊和私聊）
 
     参数:
-        chat_id: 群聊 ID
+        chat_id: 会话 ID（群聊 oc_xxx 或私聊 oc_xxx）
         text: 要回复的文本内容
     """
     token = _get_tenant_access_token()

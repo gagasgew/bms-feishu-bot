@@ -1,6 +1,8 @@
 """
 串口通信模块
-负责与 STM32F103C8T6 通过 UART 收发指令
+负责与 BMS 设备通过 UART 收发 CLI 指令
+
+注意：当前 main.py 自管串口，本模块作为备用封装保留。
 """
 import serial
 import config
@@ -24,18 +26,20 @@ def _get_serial():
 
 def send_command(cmd: str) -> str:
     """
-    发送控制指令并读取单片机回复
+    发送 BMS CLI 指令并读取设备回复
 
     参数:
-        cmd: '0'（关灯）或 '1'（开灯）
+        cmd: BMS CLI 英文指令，如 'help'、'info'、'get'
 
     返回:
-        单片机回复字符串，如 "LED ON" / "LED OFF"
+        设备回复字符串（去除末尾换行）
         超时时返回 "TIMEOUT"
+        错误时返回 "ERROR: ..."
     """
     try:
         s = _get_serial()
-        s.write(cmd.encode("utf-8"))
+        # BMS CLI 协议：指令 + 回车换行
+        s.write((cmd + "\r\n").encode("utf-8"))
         print(f"[串口] 已发送: '{cmd}'")
 
         response_bytes = s.readline()

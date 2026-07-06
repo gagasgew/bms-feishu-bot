@@ -1,39 +1,54 @@
-# 飞书聊天控制 STM32 LED 🎮💡
+# 飞书 BMS CLI 指令服务 🔋💬
 
-通过飞书群聊 @机器人 发送自然语言指令，远程控制 STM32F103C8T6 单片机上的 LED 灯亮灭。
+通过飞书群聊 @机器人 或私聊发送中文功能描述，自动映射为 BMS CLI 英文指令，经串口发送到下游设备。
 
 ## 效果演示
 
 ```
 群聊中:
-  👨 用户: @机器人 屋里好黑啊
-  🤖 机器人: ✅ 灯已打开
+  👨 用户: @机器人 查看所有命令列表
+  🤖 机器人: 指令: help (查看所有命令列表)
+             设备回复: [BMS 设备返回的命令列表]
 
-  👨 用户: @机器人 我要睡觉了，关灯吧
-  🤖 机器人: 🌙 灯已关闭
+私聊中:
+  👨 用户: 打印系统体检报告
+  🤖 机器人: 指令: info (打印系统体检报告)
+             设备回复: [BMS 设备返回的体检数据]
 
-  👨 用户: @机器人 今天天气怎么样
-  🤖 机器人: 没理解您的意思😅
+  👨 用户: 今天天气怎么样
+  🤖 机器人: 未识别该指令，请尝试使用功能描述...
 ```
 
 ## 系统架构
 
 ```
-飞书 App → 飞书服务器 → frp/ngrok → PC(Python) → 串口 → STM32F103C8T6 → LED
-                                ↑                      ↑
-                           DeepSeek API          HAL 固件控制 GPIO
-                          (意图解析)
+飞书 App → 飞书服务器 → ngrok → PC(Python) → 串口 → BMS 设备
+                                ↑
+                           DeepSeek API
+                          (中文→英文指令映射)
 ```
 
-## 硬件清单
+## 支持指令（15 条）
 
-| 器件 | 数量 | 说明 |
-|------|------|------|
-| STM32F103C8T6 开发板 | 1 | |
-| USB-TTL 模块 | 1 | 若板子自带 CH340 则不需要 |
-| LED + 220Ω 电阻 | 1 | 可用板载 LED |
-| 杜邦线 | 若干 | |
-| Windows PC | 1 | 需保持开机运行 Python 服务 |
+| 英文指令 | 中文描述 |
+|----------|----------|
+| `help` | 查看所有命令列表 |
+| `info` | 打印系统体检报告 |
+| `task` | 打印 RTOS 任务调度 |
+| `fault` | 诊断故障等级 |
+| `sim` | 开启电池模型仿真 |
+| `inj` | 采集数据偏移注入 |
+| `bal` | 控制硬件均衡通道 |
+| `calib` | 强制标定 EKF 参数 |
+| `est` | 打印/格式化 KVDB 参数 |
+| `force` | 控制主回路继电器 |
+| `sys` | 系统复位 |
+| `get` | 读取配置参数 |
+| `set` | 修改配置参数 |
+| `loglevel` | 更改日志打印级别 |
+| `log` | 读/清除黑匣子快照 |
+
+> 详细使用说明见 `01_BMS 交互式控制台 (CLI) 详细使用说明.docx`
 
 ## 快速开始
 
@@ -52,77 +67,45 @@ DEEPSEEK_API_KEY=sk-你的API-Key
 SERIAL_PORT=COM3            # 设备管理器里串口的 COM 号
 FEISHU_APP_ID=cli_xxx       # 飞书开放平台获取
 FEISHU_APP_SECRET=xxx       # 飞书开放平台获取
+FLASK_PORT=5000
 ```
 
-### 3. STM32 烧录固件
-
-详见 [`firmware/README.md`](firmware/README.md)：
-- CubeMX 配置 USART1 (115200 bps) + LED GPIO
-- 替换 `main.c` 后编译烧录
-- 串口助手发 `1` 验证 LED 亮、发 `0` 验证 LED 灭
-
-### 4. 启动服务
+### 3. 启动服务
 
 ```bash
 python main.py
 ```
 
-输出：
-```
-🚀 飞书 STM32 LED 控制服务启动中...
-   端口: 8080
-   串口: COM3
-   Webhook: http://localhost:8080/feishu/webhook
-```
-
-### 5. 内网穿透 + 飞书配置
+### 4. 内网穿透 + 飞书配置
 
 ```bash
-# 用 ngrok 暴露本地 8080
-ngrok http 8080
-
-# 获得公网 URL，如 https://abc123.ngrok-free.app
-# 复制到飞书开放平台 → 事件订阅 → 回调地址:
-# https://abc123.ngrok-free.app/feishu/webhook
+ngrok http 5000
 ```
 
-### 6. 测试
+获得公网 URL 后，填入飞书开放平台 → 事件订阅 → 回调地址：
+`https://xxx.ngrok-free.app/feishu/webhook`
 
-在飞书群聊中 @机器人 发送：
-- 「开灯」「屋里好黑」「帮我开下灯」 → LED 亮
-- 「关灯」「我要睡觉了」 → LED 灭
-- 「你好」 → 提示无法理解
+### 5. 测试
 
-也可以用 curl 本地测试串口（不经过飞书）：
+在飞书群聊中 @机器人 或直接私聊机器人发送中文功能描述即可。
+
+本地测试（不经过飞书）：
+
 ```bash
-curl -X POST http://localhost:8080/test/led -H "Content-Type: application/json" -d "{\"cmd\":\"1\"}"
+curl -X POST http://localhost:5000/test/bms \
+  -H "Content-Type: application/json" \
+  -d "{\"cmd\":\"help\"}"
 ```
 
 ## 项目结构
 
 ```
-E:\cc-study\
-├── main.py               # Flask 主入口
+├── main.py               # Flask 主入口（webhook / 去重 / 后台线程）
 ├── config.py             # 配置管理（读取 .env）
-├── intent.py             # DeepSeek 意图解析
-├── serial_ctrl.py        # 串口通信封装
-├── feishu_bot.py         # 飞书消息收发
+├── intent.py             # DeepSeek 意图解析（15条指令映射）
+├── feishu_bot.py         # 飞书消息收发（群聊+私聊）
+├── serial_ctrl.py        # 串口通信封装（备用）
+├── 指令1.md              # 15 条 CLI 指令中英文对照表
 ├── requirements.txt      # Python 依赖
-├── .env                  # 敏感凭据（不提交 Git）
-├── .gitignore
-├── firmware/             # STM32 固件代码
-│   ├── main.c            # HAL 主程序
-│   └── README.md         # 烧录说明
-├── command.py            # 原始原型代码（保留）
-└── docs/
-    └── superpowers/
-        └── specs/
-            └── 2026-06-11-feishu-stm32-led-design.md  # 设计文档
+└── .env                  # 敏感凭据（不提交 Git）
 ```
-
-## 后续扩展方向
-
-- 📹 加摄像头实现拍照回复
-- ⚙️ 控制舵机 / 继电器
-- 🌡️ 读取温湿度传感器数据
-- 📱 同时支持 Telegram Bot

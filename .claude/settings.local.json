@@ -20,7 +20,11 @@
       "PowerShell(pip install *)",
       "PowerShell(python main.py)",
       "PowerShell(curl *)",
-      "PowerShell([System.IO.Ports.SerialPort]::GetPortNames\\(\\))"
+      "PowerShell([System.IO.Ports.SerialPort]::GetPortNames\\(\\))",
+      "PowerShell($r = Invoke-WebRequest -Uri \"http://localhost:5000/health\" -UseBasicParsing -TimeoutSec 3; $r.Content)",
+      "PowerShell(python -c \"import docx; print\\('python-docx available'\\)\" 2>&1)",
+      "PowerShell(python -c \"from docx import Document; doc = Document\\('01_BMS 交互式控制台 \\(CLI\\) 详细使用说明.docx'\\); [print\\(p.text\\) for p in doc.paragraphs]\")",
+      "PowerShell(\\(Get-Item 'E:\\\\Project\\\\Battery\\\\指令1.md'\\).Length; Get-Content 'E:\\\\Project\\\\Battery\\\\指令1.md' -Encoding UTF8 | Select-Object -First 5)"
     ]
   }
 }

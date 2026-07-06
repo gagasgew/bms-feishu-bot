@@ -15,7 +15,7 @@ DEEPSEEK_BASE_URL = "https://api.deepseek.com"
 # ── 串口 ──
 SERIAL_PORT = os.getenv("SERIAL_PORT", "COM3")
 SERIAL_BAUDRATE = int(os.getenv("SERIAL_BAUDRATE", "115200"))
-SERIAL_TIMEOUT = 1.0  # 读超时(秒)
+SERIAL_TIMEOUT = 2.0  # 读超时(秒)，CLI 回复内容较长
 
 # ── 飞书 ──
 FEISHU_APP_ID = os.getenv("FEISHU_APP_ID", "")
