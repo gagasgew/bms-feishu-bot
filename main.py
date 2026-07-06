@@ -62,21 +62,43 @@ def serial_send(cmd):
 @app.route("/feishu/webhook", methods=["POST"])
 def feishu_webhook():
     body = request.get_json(force=True, silent=True)
+
+    # ── 调试日志 ──
+    import datetime
+    log_entry = f"[{datetime.datetime.now().strftime('%H:%M:%S')}] 收到请求\n"
+    log_entry += f"  Headers: {dict(request.headers)}\n"
+    log_entry += f"  Body: {json.dumps(body, ensure_ascii=False) if body else 'None'}\n"
+
     if body is None:
+        log_entry += "  结果: 空body, 返回400\n"
+        with open("webhook_debug.log", "a", encoding="utf-8") as f:
+            f.write(log_entry + "\n")
+        print(log_entry)
         return jsonify({"error": "invalid json"}), 400
 
     if body.get("type") == "url_verification":
         challenge = body.get("challenge", "")
+        log_entry += f"  类型: URL验证, challenge={challenge}\n"
+        with open("webhook_debug.log", "a", encoding="utf-8") as f:
+            f.write(log_entry + "\n")
         print(f"[飞书] URL 验证 challenge: {challenge}")
         return jsonify({"challenge": challenge})
 
     timestamp = request.headers.get("X-Lark-Request-Timestamp", "")
     nonce = request.headers.get("X-Lark-Request-Nonce", "")
     if not verify_signature(timestamp, nonce, json.dumps(body, ensure_ascii=False)):
+        log_entry += "  结果: 签名验证失败, 返回403\n"
+        with open("webhook_debug.log", "a", encoding="utf-8") as f:
+            f.write(log_entry + "\n")
+        print(log_entry)
         return jsonify({"error": "signature verification failed"}), 403
 
     msg = parse_message(body)
     if msg is None:
+        log_entry += "  结果: parse_message返回None(事件类型不匹配/非文本消息)\n"
+        with open("webhook_debug.log", "a", encoding="utf-8") as f:
+            f.write(log_entry + "\n")
+        print(log_entry)
         return jsonify({"code": 0})
 
     chat_id = msg["chat_id"]
@@ -85,20 +107,34 @@ def feishu_webhook():
     print(f"[消息] 收到: {user_text}")
 
     cmd, desc = parse_intent(user_text)
+    log_entry += f"  用户文本: {user_text}, 意图: {desc}, 命令: {cmd}\n"
 
     if cmd == "-1":
-        send_message(chat_id, "没理解您的意思，您可以跟我说「开灯」或「关灯」")
+        log_entry += "  结果: 未理解意图\n"
+        send_message(chat_id, "没理解您的意思，您可以跟我说「开灯」、「关灯」或「呼吸灯」")
     else:
         try:
             result = serial_send(cmd)
-            if "ON" in result:
+            log_entry += f"  串口结果: {result}\n"
+            if "BREATH" in result:
+                send_message(chat_id, "已切换到呼吸灯模式")
+                log_entry += "  回复: 呼吸灯\n"
+            elif "ON" in result:
                 send_message(chat_id, "灯已打开")
+                log_entry += "  回复: 灯已打开\n"
             elif "OFF" in result:
                 send_message(chat_id, "灯已关闭")
+                log_entry += "  回复: 灯已关闭\n"
             else:
                 send_message(chat_id, f"硬件无响应（{result}）")
+                log_entry += f"  回复: 硬件无响应\n"
         except Exception as e:
             send_message(chat_id, f"硬件控制失败: {e}")
+            log_entry += f"  异常: {e}\n"
+
+    with open("webhook_debug.log", "a", encoding="utf-8") as f:
+        f.write(log_entry + "\n")
+    print(log_entry)
 
     return jsonify({"code": 0})
 
@@ -114,8 +150,8 @@ def test_led():
     if data is None:
         return jsonify({"error": "invalid json"}), 400
     cmd = data.get("cmd", "")
-    if cmd not in ("0", "1"):
-        return jsonify({"error": "cmd must be '0' or '1'"}), 400
+    if cmd not in ("0", "1", "2"):
+        return jsonify({"error": "cmd must be '0', '1' or '2'"}), 400
     result = serial_send(cmd)
     return jsonify({"result": result})
 

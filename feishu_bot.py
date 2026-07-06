@@ -90,22 +90,33 @@ def parse_message(body: dict) -> dict | None:
         如果 body 结构异常或不是消息事件，返回 None
     """
     try:
-        event = body.get("event", {})
-        if event.get("type") != "im.message.receive_v1":
+        # 飞书 v2 事件格式：event_type 在 header 下
+        header = body.get("header", {})
+        if header.get("event_type") != "im.message.receive_v1":
             return None
+
+        event = body.get("event", {})
 
         message = event.get("message", {})
         content_str = message.get("content", "{}")
         content = json.loads(content_str)
 
         # 只处理文本消息
-        if content.get("text") is None:
+        text = content.get("text")
+        if text is None:
+            return None
+
+        # 去除群聊中的 @机器人 前缀（如 "@_user_1 开灯" → "开灯"）
+        import re
+        text = re.sub(r'@\S+\s*', '', text).strip()
+
+        if not text:
             return None
 
         return {
             "chat_id": message.get("chat_id", ""),
             "message_id": message.get("message_id", ""),
-            "text": content["text"],
+            "text": text,
         }
     except (json.JSONDecodeError, KeyError, TypeError) as e:
         print(f"[飞书] 解析消息失败: {e}")
