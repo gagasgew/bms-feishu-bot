@@ -1,5 +1,5 @@
 /**
- * STM32F405 LED 串口控制 — 固件主程序
+ * STM32F103C8T6 LED 串口控制 — 固件主程序
  *
  * 功能：
  *   从 USART1 接收单字节指令：
@@ -39,7 +39,7 @@ int main(void)
     MX_USART1_UART_Init();
 
     /* 发送启动消息，方便调试 */
-    char *boot_msg = "STM32F405 LED Controller Ready\r\n";
+    char *boot_msg = "STM32F103C8T6 LED Controller Ready\r\n";
     HAL_UART_Transmit(&huart1, (uint8_t *)boot_msg, strlen(boot_msg), 100);
 
     while (1)

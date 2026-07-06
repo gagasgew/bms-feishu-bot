@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-飞书聊天机器人 → DeepSeek AI 意图解析 → 串口 → STM32F405 控制 LED 亮灭。Windows PC 作为桥梁运行 Python 服务，通过 ngrok 内网穿透接收飞书回调。
+飞书聊天机器人 → DeepSeek AI 意图解析 → 串口 → STM32F103C8T6 控制 LED 亮灭。Windows PC 作为桥梁运行 Python 服务，通过 ngrok 内网穿透接收飞书回调。
 
 ## 核心链路
 

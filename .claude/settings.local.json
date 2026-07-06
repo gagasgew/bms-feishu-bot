@@ -15,7 +15,12 @@
       "PowerShell(python -c \"import flask; import serial; import requests; import dotenv; import openai; print\\('✅ 所有依赖已安装'\\)\")",
       "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" init)",
       "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" config user.name \"gagasgew\"; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" config user.email \"lisida995@gmail.com\")",
-      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" add .; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" commit -m \"初始提交：飞书聊天控制 STM32 LED 项目\")"
+      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" add .; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" commit -m \"初始提交：飞书聊天控制 STM32 LED 项目\")",
+      "PowerShell(& \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" remote add origin https://github.com/gagasgew/BOOM.git; & \"D:\\\\软件\\\\Git\\\\cmd\\\\git.exe\" push -u origin master)",
+      "PowerShell(pip install *)",
+      "PowerShell(python main.py)",
+      "PowerShell(curl *)",
+      "PowerShell([System.IO.Ports.SerialPort]::GetPortNames\\(\\))"
     ]
   }
 }

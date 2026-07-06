@@ -63,7 +63,7 @@ if __name__ == "__main__":
         cmd = get_control_command(msg)
         print(f"[意图解析] DeepSeek 决定发送指令: '{cmd}'")
 
-        # 2. 神经传导：通过串口下发给 STM32F405
+        # 2. 神经传导：通过串口下发给 STM32F103C8T6
         # if cmd in ['0', '1']:
         #     ser.write(cmd.encode('utf-8'))
         #     print(f"[硬件执行] 已向串口发送字节流: b'{cmd}'")

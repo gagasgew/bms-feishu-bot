@@ -1,8 +1,8 @@
-# STM32F405 LED 控制器 — 固件使用说明
+# STM32F103C8T6 LED 控制器 — 固件使用说明
 
 ## CubeMX 配置步骤
 
-1. 打开 STM32CubeIDE，新建 STM32 项目，选择你的芯片型号（STM32F405xx）
+1. 打开 STM32CubeIDE，新建 STM32 项目，选择你的芯片型号（STM32F103C8Tx）
 
 2. **USART1 配置**（PC ↔ STM32 通信）：
    - 左侧 Pinout → 点击 USART1 → Mode: **Asynchronous**
