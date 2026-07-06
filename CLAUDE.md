@@ -42,13 +42,13 @@ pip install -r requirements.txt
 python main.py
 
 # 本地串口测试（绕过飞书）
-curl -X POST http://localhost:8080/test/led -H "Content-Type: application/json" -d "{\"cmd\":\"1\"}"
+curl -X POST http://localhost:5000/test/led -H "Content-Type: application/json" -d "{\"cmd\":\"1\"}"
 
 # 健康检查
-curl http://localhost:8080/health
+curl http://localhost:5000/health
 
 # 内网穿透（飞书回调需要公网 URL）
-ngrok http 8080
+ngrok http 5000
 
 # 语法检查所有 Python 文件
 python -m py_compile config.py; python -m py_compile intent.py; python -m py_compile serial_ctrl.py; python -m py_compile feishu_bot.py; python -m py_compile main.py
@@ -59,9 +59,9 @@ python -m py_compile config.py; python -m py_compile intent.py; python -m py_com
 所有敏感凭据在 `.env` 文件中，由 `config.py` 通过 `python-dotenv` 加载：
 
 - `DEEPSEEK_API_KEY` — DeepSeek API 密钥
-- `SERIAL_PORT` — STM32 串口号（默认 COM3）
+- `SERIAL_PORT` — STM32 串口号（当前 `.env` 配置为 COM7）
 - `FEISHU_APP_ID` / `FEISHU_APP_SECRET` — 飞书企业自建应用凭据
-- `FLASK_PORT` — 服务端口（默认 8080）
+- `FLASK_PORT` — 服务端口（当前 `.env` 配置为 5000）
 
 `.env` 已加入 `.gitignore`，不会被提交。
 
