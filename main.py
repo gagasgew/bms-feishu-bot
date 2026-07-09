@@ -58,19 +58,23 @@ def _init_serial():
 
 
 def serial_send(cmd):
-    """发送 CLI 指令字符串到串口，返回设备回复"""
+    """发送 CLI 指令字符串到串口，循环读取直到超时，返回完整回复"""
     global _ser
     if _ser is None or not _ser.is_open:
         return "ERROR: 串口未连接"
     try:
         _ser.reset_input_buffer()          # 清空缓冲区
         _ser.write((cmd + "\r\n").encode("utf-8"))
-        resp = _ser.readline()
-        # 跳过启动消息
-        if resp and b'Ready' in resp:
+        lines = []
+        while True:
             resp = _ser.readline()
-        if resp:
-            return resp.decode("utf-8").strip()
+            if not resp:
+                break                       # 超时，无更多数据
+            line = resp.decode("utf-8").strip()
+            if line:
+                lines.append(line)
+        if lines:
+            return "\n".join(lines)
         return "TIMEOUT"
     except Exception as e:
         return f"ERROR: {e}"
